@@ -118,7 +118,14 @@ public class MvcLoadAndConfig {
                     handing = tempHanding;
                 }
             }
-            handing.nextHanding = lastDefaultHanding;
+            if (JudgeUtil.isNull(handing))
+            {
+                handing = lastDefaultHanding;
+            }
+            else
+            {
+                handing.nextHanding = lastDefaultHanding;
+            }
         }
         catch
         (InstantiationException e)
