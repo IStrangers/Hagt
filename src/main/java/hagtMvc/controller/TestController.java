@@ -6,11 +6,11 @@ import com.hagt.core.annotation.MappingFunction;
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+@Controller(baseUrl = "test")
 public class TestController {
 
     @MappingFunction
-    public Map<String,String> test(){
+    public Map<String,String> test(String param){
         Map<String,String> result = new HashMap<>();
         result.put("hagt","MVC666");
         return result;

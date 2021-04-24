@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
 
-public class MvcLoadAndConfig {
+public class MvcConfigLoad {
 
     private Set<String> classNames = new HashSet<>(999);
     private Set<Class> classes = new HashSet<>(999);
@@ -55,12 +55,12 @@ public class MvcLoadAndConfig {
         this.classMap = classMap;
     }
 
-    public static MvcLoadAndConfig load
+    public static MvcConfigLoad load
     (
         String scanPackage
     )
     {
-        MvcLoadAndConfig mvcLoadAndConfig = new MvcLoadAndConfig();
+        MvcConfigLoad mvcLoadAndConfig = new MvcConfigLoad();
         boolean isRecursion = true;
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         String packagePath = scanPackage.replace(".", "/");
@@ -145,6 +145,8 @@ public class MvcLoadAndConfig {
         Map<String, MappingFunction> mappingFunctions = new HashMap<>();
         for (Class  c : classes)
         {
+            Controller controller = (Controller) c.getDeclaredAnnotation(Controller.class);
+            String baseMappingUrl = controller.baseUrl();
             Method[] methods = c.getMethods();
             Scope scope = (Scope) c.getDeclaredAnnotation(Scope.class);
             ControllerScope controllerScope = ControllerScope.SINGLETON;
@@ -162,7 +164,11 @@ public class MvcLoadAndConfig {
                 String mapingUrl = mappingFunction.url();
                 if (JudgeUtil.isNull(mapingUrl))
                 {
-                    mapingUrl = "/" + methodName;
+                    mapingUrl = formatMappingUrl(methodName);
+                }
+                if (JudgeUtil.isNotNull(baseMappingUrl))
+                {
+                    mapingUrl = formatMappingUrl(baseMappingUrl) + formatMappingUrl(mapingUrl);
                 }
                 DefaultMappingFunction defaultMappingFunction = new DefaultMappingFunction(mapingUrl,method,c,controllerScope);
                 mappingFunctions.put(mapingUrl,defaultMappingFunction);
@@ -172,10 +178,18 @@ public class MvcLoadAndConfig {
         return defaultMapping;
     }
 
+    private static String formatMappingUrl(String mapingUrl){
+        if (!mapingUrl.startsWith("/"))
+        {
+            mapingUrl = "/" + mapingUrl;
+        }
+        return mapingUrl.replaceAll("/+","/");
+    }
+
     private static Set<Class> loadClassAll(Set<String> classNames)
     {
         Set<Class> classes = new HashSet<>();
-        ClassLoader classLoader = MvcLoadAndConfig.class.getClassLoader();
+        ClassLoader classLoader = MvcConfigLoad.class.getClassLoader();
         try
         {
             for (String className : classNames)
@@ -233,4 +247,5 @@ public class MvcLoadAndConfig {
     {
         return this.handing;
     }
+
 }

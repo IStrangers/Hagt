@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 
 public class DefaultHanding extends Handing {
 
@@ -55,6 +57,8 @@ public class DefaultHanding extends Handing {
                 return;
             }
             Method method = mappingFunction.getMethod();
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            Parameter[] parameters = method.getParameters();
             Object ownerObject = mappingFunction.getOwnerObject();
             Object result = method.invoke(ownerObject,null);
             render(result,res);

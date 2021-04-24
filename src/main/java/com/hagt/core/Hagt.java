@@ -37,7 +37,7 @@ public class Hagt
 
     public void init(String scanPackage)
     {
-        MvcLoadAndConfig config = MvcLoadAndConfig.load(scanPackage);
+        MvcConfigLoad config = MvcConfigLoad.load(scanPackage);
         mapping = config.getMapping();
         handing = config.getHanding();
     }
