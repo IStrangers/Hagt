@@ -15,6 +15,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.encoding>UTF-8</maven.compiler.encoding>
 		<com.alibaba.fastjson>1.2.50</com.alibaba.fastjson>
+		<javax.servlet-api>4.0.1</javax.servlet-api>
 	</properties>
 
 	<dependencies>
@@ -22,6 +23,11 @@
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<version>${com.alibaba.fastjson}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${javax.servlet-api}</version>
 		</dependency>
 	</dependencies>
 

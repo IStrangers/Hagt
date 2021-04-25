@@ -58,9 +58,9 @@ public class DefaultHanding extends Handing {
             }
             Method method = mappingFunction.getMethod();
             Class<?>[] parameterTypes = method.getParameterTypes();
-            Parameter[] parameters = method.getParameters();
+            Object [] params = new Object[parameterTypes.length];
             Object ownerObject = mappingFunction.getOwnerObject();
-            Object result = method.invoke(ownerObject,null);
+            Object result = method.invoke(ownerObject,params);
             render(result,res);
         }
         catch (IllegalAccessException e)

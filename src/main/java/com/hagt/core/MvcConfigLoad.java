@@ -27,7 +27,7 @@ public class MvcConfigLoad {
         return classNames;
     }
 
-    public void setClassNames(Set<String> classNames) {
+    private void setClassNames(Set<String> classNames) {
         this.classNames = classNames;
     }
 
@@ -35,23 +35,33 @@ public class MvcConfigLoad {
         return classes;
     }
 
-    public void setClasses(Set<Class> classes) {
+    private void setClasses(Set<Class> classes) {
         this.classes = classes;
     }
 
-    public void setMapping(Mapping mapping) {
+    private void setMapping(Mapping mapping) {
         this.mapping = mapping;
     }
 
-    public void setHanding(Handing handing) {
+    private void setHanding(Handing handing) {
         this.handing = handing;
+    }
+
+    public Mapping getMapping()
+    {
+        return this.mapping;
+    }
+
+    public Handing getHanding()
+    {
+        return this.handing;
     }
 
     public Map<Class, Set<Class>> getClassMap() {
         return classMap;
     }
 
-    public void setClassMap(Map<Class, Set<Class>> classMap) {
+    private void setClassMap(Map<Class, Set<Class>> classMap) {
         this.classMap = classMap;
     }
 
@@ -236,16 +246,6 @@ public class MvcConfigLoad {
             }
         }
         return className;
-    }
-
-    public Mapping getMapping()
-    {
-        return this.mapping;
-    }
-
-    public Handing getHanding()
-    {
-        return this.handing;
     }
 
 }

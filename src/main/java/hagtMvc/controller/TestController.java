@@ -9,7 +9,7 @@ import java.util.Map;
 @Controller(baseUrl = "test")
 public class TestController {
 
-    @MappingFunction
+    @MappingFunction(url = "/MVC")
     public Map<String,String> test(String param){
         Map<String,String> result = new HashMap<>();
         result.put("hagt","MVC666");
