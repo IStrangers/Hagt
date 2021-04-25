@@ -2,17 +2,19 @@ package com.hagt.core.impl;
 
 import com.hagt.core.Handing;
 import com.hagt.core.iface.MappingFunction;
+import com.hagt.core.enums.RequestType;
 import com.hagt.uitl.JudgeUtil;
 
 import javax.servlet.FilterChain;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
+import java.util.Enumeration;
+import java.util.Map;
 
 public class DefaultHanding extends Handing {
 
@@ -57,10 +59,9 @@ public class DefaultHanding extends Handing {
                 return;
             }
             Method method = mappingFunction.getMethod();
-            Class<?>[] parameterTypes = method.getParameterTypes();
-            Object [] params = new Object[parameterTypes.length];
+            Object[] invokeMethodParams = getInvokeMethodParams(req,method);
             Object ownerObject = mappingFunction.getOwnerObject();
-            Object result = method.invoke(ownerObject,params);
+            Object result = method.invoke(ownerObject,invokeMethodParams);
             render(result,res);
         }
         catch (IllegalAccessException e)
@@ -73,7 +74,36 @@ public class DefaultHanding extends Handing {
         }
     }
 
-    public void render(Object result,HttpServletResponse res)
+    private Object [] getInvokeMethodParams
+    (
+        HttpServletRequest req, Method method
+    )
+    {
+        int parameterCount = method.getParameterCount();
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        Object [] params = new Object[parameterTypes.length];
+        try
+        {
+            Map<String, String[]> parameterMap = req.getParameterMap();
+            Enumeration<String> headerNames = req.getHeaderNames();
+            String methodType = req.getMethod();
+            if (RequestType.GET != RequestType.valueOf(methodType))
+            {
+
+            }
+            ServletInputStream inputStream = req.getInputStream();
+            if (true){
+                params[parameterCount - 1] = parameterMap;
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return params;
+    }
+
+    private void render(Object result,HttpServletResponse res)
     {
         PrintWriter writer = null;
         try

@@ -10,7 +10,7 @@ import java.util.Map;
 public class TestController {
 
     @MappingFunction(url = "/MVC")
-    public Map<String,String> test(String param){
+    public Map<String,String> test(Map<String,String[]> params){
         Map<String,String> result = new HashMap<>();
         result.put("hagt","MVC666");
         return result;

@@ -1,4 +1,4 @@
-package com.hagt.enums;
+package com.hagt.core.enums;
 
 public enum  ControllerScope {
 

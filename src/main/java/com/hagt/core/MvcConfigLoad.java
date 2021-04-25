@@ -7,7 +7,7 @@ import com.hagt.core.iface.MappingFunction;
 import com.hagt.core.impl.DefaultHanding;
 import com.hagt.core.impl.DefaultMapping;
 import com.hagt.core.impl.DefaultMappingFunction;
-import com.hagt.enums.ControllerScope;
+import com.hagt.core.enums.ControllerScope;
 import com.hagt.uitl.JudgeUtil;
 
 import java.io.File;

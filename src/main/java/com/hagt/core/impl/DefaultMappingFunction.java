@@ -1,8 +1,7 @@
 package com.hagt.core.impl;
 
 import com.hagt.core.iface.MappingFunction;
-import com.hagt.enums.ControllerScope;
-import com.hagt.uitl.JudgeUtil;
+import com.hagt.core.enums.ControllerScope;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
