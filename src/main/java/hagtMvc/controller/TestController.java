@@ -13,6 +13,7 @@ public class TestController {
     public Map<String,String> test(Map<String,String[]> params){
         Map<String,String> result = new HashMap<>();
         result.put("hagt","MVC666");
+        System.out.println(result);
         return result;
     }
 
