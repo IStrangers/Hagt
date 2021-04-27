@@ -59,7 +59,7 @@ public class DefaultMappingFunction implements MappingFunction
         {
             return classToObject();
         }
-        return classToObject();
+        return invokeObject.get(ownerClass);
     }
 
     @Override

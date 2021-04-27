@@ -10,6 +10,33 @@
 	<name>Hagt</name>
 	<description></description>
 	<url></url>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<!--写你自己的，这只是个例子-->
+	<scm>
+		<url>https://gitee.com/QQXQQ/hagt</url>
+		<connection>https://gitee.com/QQXQQ/hagt.git</connection>
+		<developerConnection>https://gitee.com/QQXQQ/hagt</developerConnection>
+	</scm>
+	<!--写你自己的，这只是个例子-->
+	<developers>
+		<developer>
+			<name>QQXQQ</name>
+			<email>qqq000qqq@aliyun.com</email>
+			<url>https://gitee.com/QQXQQ/hagt</url>
+		</developer>
+	</developers>
 	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -30,6 +57,20 @@
 			<version>${javax.servlet-api}</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
 
