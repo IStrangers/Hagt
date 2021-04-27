@@ -1,6 +1,7 @@
 package com.hagt.core;
 
 import com.hagt.core.annotation.Controller;
+import com.hagt.core.annotation.RequestParam;
 import com.hagt.core.annotation.Scope;
 import com.hagt.core.iface.Mapping;
 import com.hagt.core.iface.MappingFunction;
@@ -8,10 +9,11 @@ import com.hagt.core.impl.DefaultHanding;
 import com.hagt.core.impl.DefaultMapping;
 import com.hagt.core.impl.DefaultMappingFunction;
 import com.hagt.core.enums.ControllerScope;
+import com.hagt.core.model.MethodParam;
 import com.hagt.uitl.JudgeUtil;
-
 import java.io.File;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.net.URL;
 import java.util.*;
 
@@ -158,11 +160,6 @@ public class MvcConfigLoad {
             Controller controller = (Controller) c.getDeclaredAnnotation(Controller.class);
             String baseMappingUrl = controller.baseUrl();
             Method[] methods = c.getMethods();
-            Scope scope = (Scope) c.getDeclaredAnnotation(Scope.class);
-            ControllerScope controllerScope = ControllerScope.SINGLETON;
-            if (JudgeUtil.isNotNull(scope)){
-                controllerScope = scope.getScope();
-            }
             for (Method method : methods)
             {
                 com.hagt.core.annotation.MappingFunction mappingFunction = method.getDeclaredAnnotation(com.hagt.core.annotation.MappingFunction.class);
@@ -170,25 +167,65 @@ public class MvcConfigLoad {
                 {
                     continue;
                 }
-                String methodName = method.getName();
-                String mapingUrl = mappingFunction.url();
-                if (JudgeUtil.isNull(mapingUrl))
-                {
-                    mapingUrl = formatMappingUrl(methodName);
-                }
-                if (JudgeUtil.isNotNull(baseMappingUrl))
-                {
-                    mapingUrl = formatMappingUrl(baseMappingUrl) + formatMappingUrl(mapingUrl);
-                }
-                DefaultMappingFunction defaultMappingFunction = new DefaultMappingFunction(mapingUrl,method,c,controllerScope);
-                mappingFunctions.put(mapingUrl,defaultMappingFunction);
+                String mappingUrl = getMappingUrl(method, mappingFunction, baseMappingUrl);
+                ControllerScope controllerScope = getControllerScope(c);
+                int parameterCount = method.getParameterCount();
+                Map<Class,MethodParam> methodParams = getMethodParams(method);
+                DefaultMappingFunction defaultMappingFunction = new DefaultMappingFunction(mappingUrl,method,c,controllerScope,parameterCount,methodParams);
+                mappingFunctions.put(mappingUrl,defaultMappingFunction);
             }
         }
         DefaultMapping defaultMapping = new DefaultMapping(mappingFunctions);
         return defaultMapping;
     }
 
-    private static String formatMappingUrl(String mapingUrl){
+    private static Map<Class, MethodParam> getMethodParams(Method method)
+    {
+        Map<Class, MethodParam> methodParams = new HashMap<>();
+        Parameter[] parameters = method.getParameters();
+        int paramIndex = 0;
+        for (Parameter parameter : parameters)
+        {
+            RequestParam requestParam = parameter.getDeclaredAnnotation(RequestParam.class);
+            if (JudgeUtil.isNotNull(requestParam))
+            {
+                String paramName = requestParam.value();
+                Class<?> paramType = parameter.getType();
+                MethodParam methodParam = new MethodParam(paramIndex,paramName,paramType);
+                methodParams.put(RequestParam.class,methodParam);
+            }
+            paramIndex++;
+        }
+        return methodParams;
+    }
+
+    private static ControllerScope getControllerScope(Class c)
+    {
+        Scope scope = (Scope) c.getDeclaredAnnotation(Scope.class);
+        ControllerScope controllerScope = ControllerScope.SINGLETON;
+        if (JudgeUtil.isNotNull(scope)){
+            controllerScope = scope.getScope();
+        }
+        return controllerScope;
+    }
+
+    private static String getMappingUrl(Method method,com.hagt.core.annotation.MappingFunction mappingFunction,String baseMappingUrl)
+    {
+        String methodName = method.getName();
+        String mapingUrl = mappingFunction.url();
+        if (JudgeUtil.isNull(mapingUrl))
+        {
+            mapingUrl = formatMappingUrl(methodName);
+        }
+        if (JudgeUtil.isNotNull(baseMappingUrl))
+        {
+            mapingUrl = formatMappingUrl(baseMappingUrl) + formatMappingUrl(mapingUrl);
+        }
+        return mapingUrl;
+    }
+    
+    private static String formatMappingUrl(String mapingUrl)
+    {
         if (!mapingUrl.startsWith("/"))
         {
             mapingUrl = "/" + mapingUrl;
