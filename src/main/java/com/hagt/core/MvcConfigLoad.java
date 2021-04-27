@@ -170,7 +170,7 @@ public class MvcConfigLoad {
                 String mappingUrl = getMappingUrl(method, mappingFunction, baseMappingUrl);
                 ControllerScope controllerScope = getControllerScope(c);
                 int parameterCount = method.getParameterCount();
-                Map<Class,MethodParam> methodParams = getMethodParams(method);
+                Map<Class, List<MethodParam>> methodParams = getMethodParams(method);
                 DefaultMappingFunction defaultMappingFunction = new DefaultMappingFunction(mappingUrl,method,c,controllerScope,parameterCount,methodParams);
                 mappingFunctions.put(mappingUrl,defaultMappingFunction);
             }
@@ -179,24 +179,49 @@ public class MvcConfigLoad {
         return defaultMapping;
     }
 
-    private static Map<Class, MethodParam> getMethodParams(Method method)
+    private static Map<Class, List<MethodParam>> getMethodParams(Method method)
     {
-        Map<Class, MethodParam> methodParams = new HashMap<>();
+        Map<Class, List<MethodParam>> methodParams = new HashMap<>();
         Parameter[] parameters = method.getParameters();
         int paramIndex = 0;
         for (Parameter parameter : parameters)
         {
+            Class<?> paramType = parameter.getType();
+
             RequestParam requestParam = parameter.getDeclaredAnnotation(RequestParam.class);
             if (JudgeUtil.isNotNull(requestParam))
             {
                 String paramName = requestParam.value();
-                Class<?> paramType = parameter.getType();
-                MethodParam methodParam = new MethodParam(paramIndex,paramName,paramType);
-                methodParams.put(RequestParam.class,methodParam);
+                addToMethodParams(RequestParam.class,paramIndex,paramName,paramType,methodParams);
+            }
+            else
+            {
+                String paramName = parameter.getName();
+                addToMethodParams(Parameter.class,paramIndex,paramName,paramType,methodParams);
             }
             paramIndex++;
         }
         return methodParams;
+    }
+
+    private static void addToMethodParams
+    (
+        Class type,int paramIndex,String paramName,Class paramType,
+        Map<Class, List<MethodParam>> methodParams
+    )
+    {
+        List<MethodParam> methodParamsList = methodParams.get(type);
+        MethodParam methodParam = new MethodParam(paramIndex,paramName,paramType);
+        if (JudgeUtil.isNotNull(methodParamsList))
+        {
+            methodParamsList.add(methodParam);
+        }
+        else
+        {
+            methodParamsList = new ArrayList<>();
+            methodParamsList.add(methodParam);
+        }
+        methodParams.put(type,methodParamsList);
     }
 
     private static ControllerScope getControllerScope(Class c)

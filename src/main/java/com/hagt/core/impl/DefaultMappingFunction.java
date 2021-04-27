@@ -6,6 +6,7 @@ import com.hagt.core.model.MethodParam;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultMappingFunction implements MappingFunction
@@ -14,13 +15,13 @@ public class DefaultMappingFunction implements MappingFunction
     private String path;
     private Method method;
     private int methodParamCount;
-    private Map<Class, MethodParam> methodParams;
+    private Map<Class, List<MethodParam>> methodParams;
     private Class ownerClass;
     private ControllerScope scope;
 
     public DefaultMappingFunction
     (
-        String path, Method method, Class ownerClass, ControllerScope scope,int methodParamCount, Map<Class, MethodParam> methodParams
+        String path, Method method, Class ownerClass, ControllerScope scope,int methodParamCount, Map<Class, List<MethodParam>> methodParams
     )
     {
         this.path = path;
@@ -62,7 +63,7 @@ public class DefaultMappingFunction implements MappingFunction
     }
 
     @Override
-    public Map<Class, MethodParam> getMethodParams() {
+    public Map<Class, List<MethodParam>> getMethodParams() {
         return this.methodParams;
     }
 

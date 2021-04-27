@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultHanding extends Handing {
@@ -83,32 +83,37 @@ public class DefaultHanding extends Handing {
     )
     {
         int parameterCount = mappingFunction.getParameterCount();
-        Map<Class, MethodParam> methodParams = mappingFunction.getMethodParams();
+        Map<Class, List<MethodParam>> methodParams = mappingFunction.getMethodParams();
         Object [] params = new Object[parameterCount];
         try
         {
             Enumeration<String> headerNames = req.getHeaderNames();
 
-            for (Map.Entry<Class,MethodParam> methodParamEntry : methodParams.entrySet())
+            for (Map.Entry<Class,List<MethodParam>> methodParamEntry : methodParams.entrySet())
             {
                 Class annotationType = methodParamEntry.getKey();
-                MethodParam methodParam = methodParamEntry.getValue();
-                int paramIndex = methodParam.getParamIndex();
-                String paramName = methodParam.getParamName();
-                Class<?> paramType = methodParam.getParamType();
-
-                if (annotationType.isAssignableFrom(RequestParam.class))
+                List<MethodParam> methodParamList = methodParamEntry.getValue();
+                for (MethodParam methodParam: methodParamList)
                 {
-                    String param = req.getParameter(paramName);
-                    params[paramIndex] = paramType.cast(param);
-                }
-            }
 
-            ServletInputStream inputStream = req.getInputStream();
-            if (true)
-            {
-                params[parameterCount - 1] = req.getParameterMap();
+                    int paramIndex = methodParam.getParamIndex();
+                    String paramName = methodParam.getParamName();
+                    Class<?> paramType = methodParam.getParamType();
+
+                    if (annotationType == RequestParam.class)
+                    {
+                        String param = req.getParameter(paramName);
+                        params[paramIndex] = paramType.cast(param);
+                    }
+
+                    if (annotationType == Parameter.class)
+                    {
+
+                    }
+               }
             }
+            ServletInputStream inputStream = req.getInputStream();
+
         }
         catch (IOException e)
         {
