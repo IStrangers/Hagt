@@ -1,8 +1,10 @@
 package com.hagt.core.impl;
 
 import com.hagt.core.Handing;
+import com.hagt.core.annotation.RequestParam;
 import com.hagt.core.iface.MappingFunction;
 import com.hagt.core.enums.RequestType;
+import com.hagt.core.model.MethodParam;
 import com.hagt.uitl.JudgeUtil;
 
 import javax.servlet.FilterChain;
@@ -11,9 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultHanding extends Handing {
@@ -59,7 +61,8 @@ public class DefaultHanding extends Handing {
                 return;
             }
             Method method = mappingFunction.getMethod();
-            Object[] invokeMethodParams = getInvokeMethodParams(req,method);
+
+            Object[] invokeMethodParams = getInvokeMethodParams(req,mappingFunction);
             Object ownerObject = mappingFunction.getOwnerObject();
             Object result = method.invoke(ownerObject,invokeMethodParams);
             render(result,res);
@@ -76,25 +79,41 @@ public class DefaultHanding extends Handing {
 
     private Object [] getInvokeMethodParams
     (
-        HttpServletRequest req, Method method
+            HttpServletRequest req, MappingFunction mappingFunction
     )
     {
-        int parameterCount = method.getParameterCount();
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        Object [] params = new Object[parameterTypes.length];
+        int parameterCount = mappingFunction.getParameterCount();
+        Map<Class, List<MethodParam>> methodParams = mappingFunction.getMethodParams();
+        Object [] params = new Object[parameterCount];
         try
         {
-            Map<String, String[]> parameterMap = req.getParameterMap();
             Enumeration<String> headerNames = req.getHeaderNames();
-            String methodType = req.getMethod();
-            if (RequestType.GET != RequestType.valueOf(methodType))
-            {
 
+            for (Map.Entry<Class,List<MethodParam>> methodParamEntry : methodParams.entrySet())
+            {
+                Class annotationType = methodParamEntry.getKey();
+                List<MethodParam> methodParamList = methodParamEntry.getValue();
+                for (MethodParam methodParam: methodParamList)
+                {
+
+                    int paramIndex = methodParam.getParamIndex();
+                    String paramName = methodParam.getParamName();
+                    Class<?> paramType = methodParam.getParamType();
+
+                    if (annotationType == RequestParam.class)
+                    {
+                        String param = req.getParameter(paramName);
+                        params[paramIndex] = paramType.cast(param);
+                    }
+
+                    if (annotationType == Parameter.class)
+                    {
+
+                    }
+               }
             }
             ServletInputStream inputStream = req.getInputStream();
-            if (true){
-                params[parameterCount - 1] = parameterMap;
-            }
+
         }
         catch (IOException e)
         {
