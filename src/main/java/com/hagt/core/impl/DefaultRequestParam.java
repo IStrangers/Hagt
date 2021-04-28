@@ -6,6 +6,7 @@ import com.hagt.core.enums.RequestContentType;
 import com.hagt.core.enums.RequestType;
 import com.hagt.core.iface.GetRequestParam;
 import com.hagt.uitl.JudgeUtil;
+import com.hagt.uitl.MapUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -15,29 +16,80 @@ import java.util.Map;
 public class DefaultRequestParam implements GetRequestParam {
 
     private HttpServletRequest request;
-    private String header;
+    private String requestContentType;
     private String rowData;
     JSONObject rowDataJSON;
     private Map<String, String[]> parameterMap;
 
     public DefaultRequestParam(HttpServletRequest request){
-        this.header = request.getHeader("content-type");
+        this.requestContentType = request.getHeader("content-type");
+        if (JudgeUtil.isNull(this.requestContentType))
+        {
+            this.requestContentType = request.getContentType();
+        }
         this.request = request;
         init();
     }
 
     private void init()
     {
-        this.parameterMap = this.request.getParameterMap();
+        this.parameterMap = MapUtil.copyMap(this.request.getParameterMap());
         if (RequestType.POST == RequestType.valueOf(request.getMethod()))
         {
             this.rowData = getPostData();
         }
-        if (RequestContentType.MULTIPART_FORM_DATA.getTypeValue().equals(this.header))
+        if (this.requestContentType.startsWith(RequestContentType.MULTIPART_FORM_DATA.getTypeValue()))
         {
-            String data = this.rowData;
+            String boundary = "--" + this.requestContentType.split("=")[1];
+            String[] bodyArray = this.rowData.split("\n");
+            String currentLine = null;
+            String name = null;
+            StringBuilder content = new StringBuilder();
+            String fileName = null;
+            String type = null;
+            for (String body : bodyArray)
+            {
+                if (JudgeUtil.isNull(body)) continue;
+                currentLine = body;
+                if (currentLine.startsWith(boundary))
+                {
+                    if (JudgeUtil.isNull(name)) continue;
+                    parameterMap.put(name,new String[]{content.toString(),fileName,type});
+                    content.setLength(0);
+                    continue;
+                }
+                else
+                {
+                    if (currentLine.startsWith("Content-Disposition: form-data;"))
+                    {
+                        String[] contentDisposition = currentLine.split(";");
+
+                        for (String attr : contentDisposition)
+                        {
+                            String[] splitAttr = attr.replaceAll("\"", "").trim().split("=");
+                            if (JudgeUtil.isEmptyArray(splitAttr)) continue;
+                            if (splitAttr[0].equals("name"))
+                            {
+                                name = splitAttr[1];
+                            }
+                            if (splitAttr[0].equals("filename"))
+                            {
+                                fileName = splitAttr[1];
+                            }
+                        }
+                    }
+                    else if (currentLine.startsWith("Content-Type:"))
+                    {
+                        type = currentLine.split(":")[1].trim();
+                    }
+                    else
+                    {
+                        content.append(currentLine);
+                    }
+                }
+            }
         }
-        if (RequestContentType.APPLICATION_JSON.getTypeValue().equals(this.header))
+        if (RequestContentType.APPLICATION_JSON.getTypeValue().equals(this.requestContentType))
         {
             this.rowDataJSON = JSON.parseObject(this.rowData);
         }
@@ -83,6 +135,7 @@ public class DefaultRequestParam implements GetRequestParam {
         }
         else
         {
+            if (JudgeUtil.isNull(this.rowDataJSON)) return null;
             String[] indexPaths = name.split("\\.");
             JSONObject result = null;
             for (String indexPath : indexPaths)
@@ -126,8 +179,8 @@ public class DefaultRequestParam implements GetRequestParam {
     }
 
     @Override
-    public String getHeader() {
-        return this.header;
+    public String getRequestContentType() {
+        return this.requestContentType;
     }
 
 }

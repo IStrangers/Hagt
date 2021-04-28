@@ -24,6 +24,6 @@ public class JudgeUtil {
 
     public static boolean isEmptyArray(Object [] v)
     {
-        return v == null ? true : v.length > 0;
+        return v == null ? true : v.length <= 0;
     }
 }

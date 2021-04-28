@@ -103,7 +103,15 @@ public class DefaultHanding extends Handing {
 
                 if (annotationType == RequestParam.class)
                 {
-                    String param = requestParam.getParam(paramName);
+                    Object param = null;
+                    if (paramType.isArray())
+                    {
+                        param = requestParam.getParams(paramName);
+                    }
+                    else
+                    {
+                        param = requestParam.getParam(paramName);
+                    }
                     params[paramIndex] = paramType.cast(param);
                 }
 

@@ -6,6 +6,10 @@ import com.hagt.core.annotation.RequestBody;
 import com.hagt.core.annotation.RequestParam;
 import hagtMvc.entity.User;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,13 +20,16 @@ public class TestController {
     public Map<String,String> test
     (
         @RequestParam("HagtMvc") String v,
-        @RequestParam("HagtMvc") String v2,
+        @RequestParam("dddd") String v2,
+        @RequestParam("file") String[] file,
         @RequestBody("data.user") User user
     )
+        throws IOException
     {
-        System.out.println(v);
-        System.out.println(v2);
-        System.out.println(user);
+        OutputStream outputStream = new FileOutputStream("C:\\Users\\Administrator\\Desktop\\" + file[1]);
+        outputStream.write(file[0].getBytes());
+        outputStream.flush();
+        outputStream.close();
         Map<String,String> result = new HashMap<>();
         result.put("hagt","MVC666");
         return result;
