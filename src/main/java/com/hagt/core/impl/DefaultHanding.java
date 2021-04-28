@@ -66,7 +66,7 @@ public class DefaultHanding extends Handing {
             }
             Method method = mappingFunction.getMethod();
 
-            Object[] invokeMethodParams = getInvokeMethodParams(req,mappingFunction);
+            Object[] invokeMethodParams = getInvokeMethodParams(req,res,mappingFunction);
             Object ownerObject = mappingFunction.getOwnerObject();
             Object result = method.invoke(ownerObject,invokeMethodParams);
             render(result,res);
@@ -82,9 +82,9 @@ public class DefaultHanding extends Handing {
     }
 
     private Object [] getInvokeMethodParams
-    (
-            HttpServletRequest req, MappingFunction mappingFunction
-    )
+            (
+                    HttpServletRequest req, HttpServletResponse res, MappingFunction mappingFunction
+            )
     {
         int parameterCount = mappingFunction.getParameterCount();
         Map<Class, List<MethodParam>> methodParams = mappingFunction.getMethodParams();
@@ -123,7 +123,15 @@ public class DefaultHanding extends Handing {
 
                 if (annotationType == Parameter.class)
                 {
+                    if (paramType == HttpServletRequest.class)
+                    {
+                        params[paramIndex] = req;
+                    }
 
+                    if (paramType == HttpServletResponse.class)
+                    {
+                        params[paramIndex] = res;
+                    }
                 }
            }
         }

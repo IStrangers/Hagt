@@ -6,6 +6,8 @@ import com.hagt.core.annotation.RequestBody;
 import com.hagt.core.annotation.RequestParam;
 import hagtMvc.entity.User;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,10 +21,11 @@ public class TestController {
     @MappingFunction(url = "/MVC")
     public Map<String,String> test
     (
-        @RequestParam("HagtMvc") String v,
         @RequestParam("dddd") String v2,
-        @RequestParam("file") String[] file,
-        @RequestBody("data.user") User user
+        @RequestParam("HagtMvc") String[] file,
+        @RequestBody("data.user") User user,
+        HttpServletRequest request,
+        HttpServletResponse response
     )
         throws IOException
     {

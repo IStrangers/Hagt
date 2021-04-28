@@ -8,9 +8,14 @@ import com.hagt.core.iface.GetRequestParam;
 import com.hagt.uitl.JudgeUtil;
 import com.hagt.uitl.MapUtil;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultRequestParam implements GetRequestParam {
@@ -34,60 +39,63 @@ public class DefaultRequestParam implements GetRequestParam {
     private void init()
     {
         this.parameterMap = MapUtil.copyMap(this.request.getParameterMap());
-        if (RequestType.POST == RequestType.valueOf(request.getMethod()))
-        {
-            this.rowData = getPostData();
-        }
         if (this.requestContentType.startsWith(RequestContentType.MULTIPART_FORM_DATA.getTypeValue()))
         {
-            String boundary = "--" + this.requestContentType.split("=")[1];
-            String[] bodyArray = this.rowData.split("\n");
-            String currentLine = null;
-            String name = null;
-            StringBuilder content = new StringBuilder();
-            String fileName = null;
-            String type = null;
-            for (String body : bodyArray)
+            try
             {
-                if (JudgeUtil.isNull(body)) continue;
-                currentLine = body;
-                if (currentLine.startsWith(boundary))
+                String boundary = "--" + this.requestContentType.split("=")[1];
+                ServletInputStream inputStream = this.request.getInputStream();
+                int contentLength = this.request.getContentLength();
+                byte [] listByte = new byte[contentLength];
+                int length = 0;
+                int readLength = 0;
+                byte b = -1;
+                while ((b = (byte) inputStream.read()) != -1)
                 {
-                    if (JudgeUtil.isNull(name)) continue;
-                    parameterMap.put(name,new String[]{content.toString(),fileName,type});
-                    content.setLength(0);
-                    continue;
-                }
-                else
-                {
-                    if (currentLine.startsWith("Content-Disposition: form-data;"))
+                    if (b == '\r')
                     {
-                        String[] contentDisposition = currentLine.split(";");
-
-                        for (String attr : contentDisposition)
+                        String content = new String(listByte,readLength,length);
+                        if (content.startsWith(boundary))
                         {
-                            String[] splitAttr = attr.replaceAll("\"", "").trim().split("=");
-                            if (JudgeUtil.isEmptyArray(splitAttr)) continue;
-                            if (splitAttr[0].equals("name"))
+                            b = (byte) inputStream.read();
+                            listByte[length] = b;
+                            length++;
+                        }
+                        else if (content.contains("Content-Disposition:"))
+                        {
+                            String[] splitContent = content.split(";");
+                            for (String attr : splitContent)
                             {
-                                name = splitAttr[1];
-                            }
-                            if (splitAttr[0].equals("filename"))
-                            {
-                                fileName = splitAttr[1];
+                                String[] splitAttr = attr.replaceAll("\"", "").trim().split("=");
+                                if (JudgeUtil.isEmptyArray(splitAttr)) continue;
+                                if (splitAttr[0].equals("name"))
+                                {
+                                    String name = splitAttr[1];
+                                }
+                                if (splitAttr[0].equals("filename"))
+                                {
+                                    String fileName = splitAttr[1];
+                                }
                             }
                         }
+                        else if (content.contains("Content-Type:"))
+                        {
+                            String type = content.split(":")[1].trim();
+                        }
+                        readLength = length;
                     }
-                    else if (currentLine.startsWith("Content-Type:"))
-                    {
-                        type = currentLine.split(":")[1].trim();
-                    }
-                    else
-                    {
-                        content.append(currentLine);
-                    }
+                    listByte[length] = b;
+                    length++;
                 }
             }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else if (RequestType.POST == RequestType.valueOf(request.getMethod()))
+        {
+            this.rowData = getPostData();
         }
         if (RequestContentType.APPLICATION_JSON.getTypeValue().equals(this.requestContentType))
         {
@@ -101,7 +109,7 @@ public class DefaultRequestParam implements GetRequestParam {
         try
         {
             StringBuilder ret;
-            br = this.request.getReader();
+            br = new BufferedReader(new InputStreamReader(this.request.getInputStream(),"UTF-8"));
 
             String line = br.readLine();
             if (line != null)
