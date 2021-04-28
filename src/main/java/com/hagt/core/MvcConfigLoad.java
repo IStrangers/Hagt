@@ -1,6 +1,7 @@
 package com.hagt.core;
 
 import com.hagt.core.annotation.Controller;
+import com.hagt.core.annotation.RequestBody;
 import com.hagt.core.annotation.RequestParam;
 import com.hagt.core.annotation.Scope;
 import com.hagt.core.iface.Mapping;
@@ -189,10 +190,16 @@ public class MvcConfigLoad {
             Class<?> paramType = parameter.getType();
 
             RequestParam requestParam = parameter.getDeclaredAnnotation(RequestParam.class);
+            RequestBody requestBody = parameter.getDeclaredAnnotation(RequestBody.class);
             if (JudgeUtil.isNotNull(requestParam))
             {
                 String paramName = requestParam.value();
                 addToMethodParams(RequestParam.class,paramIndex,paramName,paramType,methodParams);
+            }
+            else if (JudgeUtil.isNotNull(requestBody))
+            {
+                String paramName = requestBody.value();
+                addToMethodParams(RequestBody.class,paramIndex,paramName,paramType,methodParams);
             }
             else
             {

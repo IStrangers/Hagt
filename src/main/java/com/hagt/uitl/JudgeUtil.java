@@ -21,4 +21,9 @@ public class JudgeUtil {
     public static boolean isEquals(Object o1,Object o2){
         return o1 == o2;
     }
+
+    public static boolean isEmptyArray(Object [] v)
+    {
+        return v == null ? true : v.length > 0;
+    }
 }
