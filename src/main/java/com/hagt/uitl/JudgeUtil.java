@@ -10,6 +10,10 @@ public class JudgeUtil {
         return  o != null;
     }
 
+    public static boolean isNotNull(String o){
+        return  o != null ? true : !"".equals(o.trim());
+    }
+
     public static boolean isFileString(String v){
         return "file".equals(v);
     }

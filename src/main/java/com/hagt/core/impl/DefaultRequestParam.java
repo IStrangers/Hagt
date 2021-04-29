@@ -41,14 +41,16 @@ public class DefaultRequestParam implements GetRequestParam {
         this.parameterMap = MapUtil.copyMap(this.request.getParameterMap());
         if (this.requestContentType.startsWith(RequestContentType.MULTIPART_FORM_DATA.getTypeValue()))
         {
+            ServletInputStream inputStream = null;
             try
             {
+                inputStream = this.request.getInputStream();
                 String boundary = "--" + this.requestContentType.split("=")[1];
-                ServletInputStream inputStream = this.request.getInputStream();
                 int contentLength = this.request.getContentLength();
                 byte [] listByte = new byte[contentLength];
                 int length = 0;
                 int readLength = 0;
+                int readCount = 0;
                 byte b = -1;
                 while ((b = (byte) inputStream.read()) != -1)
                 {
@@ -57,9 +59,8 @@ public class DefaultRequestParam implements GetRequestParam {
                         String content = new String(listByte,readLength,length);
                         if (content.startsWith(boundary))
                         {
-                            b = (byte) inputStream.read();
-                            listByte[length] = b;
-                            length++;
+                            readCount = 1;
+                            readLength = length + 1 + readCount;
                         }
                         else if (content.contains("Content-Disposition:"))
                         {
@@ -77,20 +78,50 @@ public class DefaultRequestParam implements GetRequestParam {
                                     String fileName = splitAttr[1];
                                 }
                             }
+                            readCount = 1;
+                            readLength = length + 1 +readCount;
                         }
                         else if (content.contains("Content-Type:"))
                         {
                             String type = content.split(":")[1].trim();
+                            readCount = 1;
+                            readLength = length + readCount;
                         }
-                        readLength = length;
+                        else
+                        {
+                            readCount = 2;
+                            readLength = length + readCount;
+                            if (JudgeUtil.isNotNull(content))
+                            {
+
+                            }
+                        }
                     }
                     listByte[length] = b;
                     length++;
+                    while (readCount > 0)
+                    {
+                        b = (byte) inputStream.read();
+                        listByte[length] = b;
+                        length++;
+                        readCount--;
+                    }
                 }
             }
             catch (IOException e)
             {
                 e.printStackTrace();
+            }
+            finally
+            {
+                if (JudgeUtil.isNotNull(inputStream))
+                {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
         else if (RequestType.POST == RequestType.valueOf(request.getMethod()))
