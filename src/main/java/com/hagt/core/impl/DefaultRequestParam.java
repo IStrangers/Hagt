@@ -54,9 +54,14 @@ public class DefaultRequestParam implements GetRequestParam {
                 byte b = -1;
                 while ((b = (byte) inputStream.read()) != -1)
                 {
+                    String sssss = new String(listByte);
                     if (b == '\r')
                     {
-                        String content = new String(listByte,readLength,length);
+                        String content = new String(listByte,readLength,length - readLength);
+                        if (content.contains(boundary + "--"))
+                        {
+                            break;
+                        }
                         if (content.startsWith(boundary))
                         {
                             readCount = 1;
