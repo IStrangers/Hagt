@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
-	<groupId>com.Hagt.qqxqq</groupId>
+	<groupId>io.gitee.qqxqq</groupId>
 	<artifactId>Hagt</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
@@ -23,13 +23,13 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	<!--写你自己的，这只是个例子-->
+
 	<scm>
 		<url>https://gitee.com/QQXQQ/hagt</url>
 		<connection>https://gitee.com/QQXQQ/hagt.git</connection>
 		<developerConnection>https://gitee.com/QQXQQ/hagt</developerConnection>
 	</scm>
-	<!--写你自己的，这只是个例子-->
+
 	<developers>
 		<developer>
 			<name>QQXQQ</name>
@@ -44,7 +44,7 @@
 			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 		<repository>
-			<id>sonatype-nexus-snapshots</id>
+			<id>sonatype-nexus-releases</id>
 			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
@@ -55,6 +55,12 @@
 		<com.alibaba.fastjson>1.2.50</com.alibaba.fastjson>
 		<javax.servlet-api>4.0.1</javax.servlet-api>
 	</properties>
+
+	<profiles>
+		<profile>
+			<id>sonatype-oss-release</id>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -74,11 +80,52 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

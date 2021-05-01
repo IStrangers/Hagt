@@ -54,7 +54,6 @@ public class DefaultRequestParam implements GetRequestParam {
                 byte b = -1;
                 while ((b = (byte) inputStream.read()) != -1)
                 {
-                    String sssss = new String(listByte);
                     if (b == '\r')
                     {
                         String content = new String(listByte,readLength,length - readLength);
@@ -94,12 +93,12 @@ public class DefaultRequestParam implements GetRequestParam {
                         }
                         else
                         {
-                            readCount = 2;
-                            readLength = length + readCount;
                             if (JudgeUtil.isNotNull(content))
                             {
 
                             }
+                            readCount = 2;
+                            readLength = length + readCount;
                         }
                     }
                     listByte[length] = b;
