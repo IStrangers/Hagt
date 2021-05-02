@@ -5,17 +5,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.hagt.core.enums.RequestContentType;
 import com.hagt.core.enums.RequestType;
 import com.hagt.core.iface.GetRequestParam;
+import com.hagt.core.parse.MultipartFormDataParse;
+import com.hagt.core.parse.model.MultipartFormData;
 import com.hagt.uitl.JudgeUtil;
 import com.hagt.uitl.MapUtil;
-
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class DefaultRequestParam implements GetRequestParam {
@@ -25,6 +23,7 @@ public class DefaultRequestParam implements GetRequestParam {
     private String rowData;
     JSONObject rowDataJSON;
     private Map<String, String[]> parameterMap;
+    private Map<String, byte[]> binaryParameterMap = new HashMap<>();
 
     public DefaultRequestParam(HttpServletRequest request){
         this.requestContentType = request.getHeader("content-type");
@@ -39,94 +38,9 @@ public class DefaultRequestParam implements GetRequestParam {
     private void init()
     {
         this.parameterMap = MapUtil.copyMap(this.request.getParameterMap());
-        if (this.requestContentType.startsWith(RequestContentType.MULTIPART_FORM_DATA.getTypeValue()))
+        if (JudgeUtil.isNotNull(this.requestContentType) && this.requestContentType.startsWith(RequestContentType.MULTIPART_FORM_DATA.getTypeValue()))
         {
-            ServletInputStream inputStream = null;
-            try
-            {
-                inputStream = this.request.getInputStream();
-                String boundary = "--" + this.requestContentType.split("=")[1];
-                int contentLength = this.request.getContentLength();
-                byte [] listByte = new byte[contentLength];
-                int length = 0;
-                int readLength = 0;
-                int readCount = 0;
-                byte b = -1;
-                while ((b = (byte) inputStream.read()) != -1)
-                {
-                    if (b == '\r')
-                    {
-                        String content = new String(listByte,readLength,length - readLength);
-                        if (content.contains(boundary + "--"))
-                        {
-                            break;
-                        }
-                        if (content.startsWith(boundary))
-                        {
-                            readCount = 1;
-                            readLength = length + 1 + readCount;
-                        }
-                        else if (content.contains("Content-Disposition:"))
-                        {
-                            String[] splitContent = content.split(";");
-                            for (String attr : splitContent)
-                            {
-                                String[] splitAttr = attr.replaceAll("\"", "").trim().split("=");
-                                if (JudgeUtil.isEmptyArray(splitAttr)) continue;
-                                if (splitAttr[0].equals("name"))
-                                {
-                                    String name = splitAttr[1];
-                                }
-                                if (splitAttr[0].equals("filename"))
-                                {
-                                    String fileName = splitAttr[1];
-                                }
-                            }
-                            readCount = 1;
-                            readLength = length + 1 +readCount;
-                        }
-                        else if (content.contains("Content-Type:"))
-                        {
-                            String type = content.split(":")[1].trim();
-                            readCount = 1;
-                            readLength = length + readCount;
-                        }
-                        else
-                        {
-                            if (JudgeUtil.isNotNull(content))
-                            {
-
-                            }
-                            readCount = 2;
-                            readLength = length + readCount;
-                        }
-                    }
-                    listByte[length] = b;
-                    length++;
-                    while (readCount > 0)
-                    {
-                        b = (byte) inputStream.read();
-                        listByte[length] = b;
-                        length++;
-                        readCount--;
-                    }
-                }
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            finally
-            {
-                if (JudgeUtil.isNotNull(inputStream))
-                {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+            initMultipartFormData();
         }
         else if (RequestType.POST == RequestType.valueOf(request.getMethod()))
         {
@@ -135,6 +49,20 @@ public class DefaultRequestParam implements GetRequestParam {
         if (RequestContentType.APPLICATION_JSON.getTypeValue().equals(this.requestContentType))
         {
             this.rowDataJSON = JSON.parseObject(this.rowData);
+        }
+    }
+
+    private void initMultipartFormData() {
+        Map<String, MultipartFormData> multipartFormData = MultipartFormDataParse.parse(this.request);
+        for (MultipartFormData m : multipartFormData.values())
+        {
+            if (m.isFile())
+            {
+                binaryParameterMap.put(m.getName(),m.getData());
+            }
+            else {
+                parameterMap.put(m.getName(),new String[]{new String(m.getData())});
+            }
         }
     }
 
@@ -212,6 +140,18 @@ public class DefaultRequestParam implements GetRequestParam {
     @Override
     public String[] getParams(String name) {
         String[] v = this.parameterMap.get(name);
+        if (JudgeUtil.isEmptyArray(v))
+        {
+            return null;
+        }
+        else{
+            return v;
+        }
+    }
+
+    @Override
+    public byte[] getBinaryParams(String name) {
+        byte[] v = this.binaryParameterMap.get(name);
         if (JudgeUtil.isEmptyArray(v))
         {
             return null;

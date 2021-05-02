@@ -3,6 +3,7 @@ package com.hagt.core.impl;
 import com.alibaba.fastjson.JSON;
 import com.hagt.core.Handing;
 import com.hagt.core.annotation.RequestBody;
+import com.hagt.core.annotation.RequestFile;
 import com.hagt.core.annotation.RequestParam;
 import com.hagt.core.iface.GetRequestParam;
 import com.hagt.core.iface.MappingFunction;
@@ -15,6 +16,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.*;
@@ -111,6 +113,21 @@ public class DefaultHanding extends Handing {
                     else
                     {
                         param = requestParam.getParam(paramName);
+                    }
+                    params[paramIndex] = paramType.cast(param);
+                }
+
+                if (annotationType == RequestFile.class)
+                {
+                    Object param = null;
+                    System.out.println(paramType.getTypeName());
+                    if (paramType.isArray())
+                    {
+                        param = requestParam.getBinaryParams(paramName);
+                    }
+                    else if (paramType == File.class)
+                    {
+                        param = null;
                     }
                     params[paramIndex] = paramType.cast(param);
                 }
