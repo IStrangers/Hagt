@@ -25,7 +25,7 @@ public class TestController {
     )
         throws IOException
     {
-        FileOutputStream fileOutputStream = new FileOutputStream("C:\\Users\\Administrator\\Desktop\\666.gif");
+        FileOutputStream fileOutputStream = new FileOutputStream("C:\\Users\\Administrator\\Desktop\\666.pdf");
         fileOutputStream.write(file);
         fileOutputStream.flush();
         fileOutputStream.close();

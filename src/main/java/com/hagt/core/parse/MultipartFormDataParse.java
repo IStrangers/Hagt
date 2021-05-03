@@ -43,7 +43,7 @@ public class MultipartFormDataParse
                 if (b == '\r')
                 {
                     String content = new String(listByte,readLength,length - readLength);
-                    if (content.startsWith(boundary))
+                    if (content.contains(boundary))
                     {
                         if (JudgeUtil.isNotNull(name))
                         {
@@ -64,6 +64,10 @@ public class MultipartFormDataParse
                             fileName = null;
                             type = null;
                             data = new ArrayList<>();
+                        }
+                        if (content.contains(endBoundary))
+                        {
+                            break;
                         }
                         readCount = 1;
                         readLength = length + 1 + readCount;

@@ -4,7 +4,7 @@
 	
 	<groupId>io.gitee.qqxqq</groupId>
 	<artifactId>Hagt</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.7</version>
 	<packaging>jar</packaging>
 	
 	<name>Hagt</name>

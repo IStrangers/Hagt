@@ -120,7 +120,6 @@ public class DefaultHanding extends Handing {
                 if (annotationType == RequestFile.class)
                 {
                     Object param = null;
-                    System.out.println(paramType.getTypeName());
                     if (paramType.isArray())
                     {
                         param = requestParam.getBinaryParams(paramName);
