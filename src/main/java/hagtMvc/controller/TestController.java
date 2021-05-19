@@ -1,6 +1,9 @@
 package hagtMvc.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.hagt.core.annotation.*;
+import com.hagt.uitl.RandomUtil;
+import com.hagt.uitl.SortUtil;
 import hagtMvc.entity.User;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,4 +37,35 @@ public class TestController {
         return result;
     }
 
+    @MappingFunction(url = "getRandomCode")
+    public String getRandomCode(){
+        String s = RandomUtil.GetRandomNumber();
+        System.out.println(s);
+        return s;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        long l = System.currentTimeMillis();
+        System.out.println(l);
+        int [] BubbleArray = new int[]{2,156,132,5,1,156,844,64,614,6541,6146,464651,64,64641,0,5616,31,31,65};
+        int[] BubbleSort = SortUtil.Bubble.sort(BubbleArray);
+        System.out.println(System.currentTimeMillis() - l);
+        System.out.println(JSON.toJSONString(BubbleSort));
+
+        l = System.currentTimeMillis();
+        System.out.println(l);
+        int [] SelectionArray = new int[]{2,156,132,5,1,156,844,64,614,6541,6146,464651,64,64641,0,5616,31,31,65};
+        int[] SelectionSort = SortUtil.Selection.sort(SelectionArray);
+        System.out.println(System.currentTimeMillis() - l);
+        System.out.println(JSON.toJSONString(SelectionSort));
+
+        l = System.currentTimeMillis();
+        System.out.println(l);
+        int [] InsertionArray = new int[]{2,156,132,5,1,156,844,64,614,6541,6146,464651,64,64641,0,5616,31,31,65};
+        int[] InsertionSort = SortUtil.Insertion.sort(InsertionArray);
+        System.out.println(System.currentTimeMillis() - l);
+        System.out.println(JSON.toJSONString(InsertionSort));
+
+
+    }
 }

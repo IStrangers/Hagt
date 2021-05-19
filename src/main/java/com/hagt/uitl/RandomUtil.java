@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class RandomUtil {
 
+    private static final RandomUtil ME = new RandomUtil();
+
     private static final Map<String,Object> RANDOM_NUMBER_MAP = new HashMap<>();
 
     private static volatile long preTime;
@@ -23,16 +25,22 @@ public class RandomUtil {
             't','u','v','w','x','y','z','0'
     };
 
+    public static String GetRandomNumber()
+    {
+        return ME.getRandomNumber();
+    }
+
     public String getRandomNumber()
     {
         long currentTime = System.currentTimeMillis();
         String result = generateRandomNumber(currentTime,0);
         if (preTime == currentTime){
             while (RANDOM_NUMBER_MAP.containsKey(result)) {
+                System.out.println("-----" + result + "-----");
                 result = generateRandomNumber(currentTime,i.incrementAndGet());
             }
         }else{
-            i.set(0);
+            i.set(0L);
             RANDOM_NUMBER_MAP.clear();
         }
         RANDOM_NUMBER_MAP.put(result,0);
@@ -62,11 +70,10 @@ public class RandomUtil {
         RandomUtil randomUtil = new RandomUtil();
         System.out.println(System.currentTimeMillis());
         int i = 1;
-        while (i < 100000000){
+        while (i < 10000000){
             String randomNumber = randomUtil.getRandomNumber();
             i++;
         }
         System.out.println(System.currentTimeMillis());
-        System.out.println(randomUtil.i);
     }
 }
