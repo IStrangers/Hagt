@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,6 +67,13 @@ public class TestController {
         System.out.println(System.currentTimeMillis() - l);
         System.out.println(JSON.toJSONString(InsertionSort));
 
+        l = System.currentTimeMillis();
+        System.out.println(l);
+        int [] ShellArray = new int[]{2,156,132,5,1,156,844,64,614,6541,6146,464651,64,64641,0,5616,31,31,65};
+        int[] ShellSort = SortUtil.Shell.sort(ShellArray);
+        System.out.println(System.currentTimeMillis() - l);
+        System.out.println(JSON.toJSONString(ShellSort));
 
     }
+
 }

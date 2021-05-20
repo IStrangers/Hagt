@@ -1,5 +1,7 @@
 package com.hagt.uitl;
 
+import com.alibaba.fastjson.JSON;
+
 import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -135,25 +137,13 @@ public class SortUtil
             }
             for ( int i = 0 ; i < array.length - 1; i++ )
             {
-                int sufI = i + 1;
-                if ( biFunction.apply(array[i],array[sufI]) )
+                int p = i ;
+                T v = array[p + 1];
+                for ( ; p >= 0 && biFunction.apply(array[p],v) ; p-- )
                 {
-                    T tempI = array[i];
-                    array[i] = array[sufI];
-                    array[sufI] = tempI;
-                    for (int o = i ; o >= 1 ; o-- )
-                    {
-                        int sufO = o - 1;
-                        if ( biFunction.apply(array[sufO],array[o]) )
-                        {
-                            T tempO = array[o];
-                            array[o] = array[sufO];
-                            array[sufO] = tempO;
-                        } else {
-                            break;
-                        }
-                    }
+                    array[p + 1] = array[p];
                 }
+                array[p + 1] = v;
             }
             return array;
         }
@@ -164,7 +154,47 @@ public class SortUtil
      */
     public static class Shell
     {
+        public static int[] sort(int[] array)
+        {
+            Integer[] integerArray = Arrays.stream(array).boxed().toArray(Integer[]::new);
+            if ( isEmptyArray(integerArray) )
+            {
+                return array;
+            }
+            int[] intArray = Arrays.stream(sort(integerArray)).mapToInt(Integer::intValue).toArray();
+            return intArray;
+        }
 
+        public static Integer[] sort(Integer[] array)
+        {
+            if ( isEmptyArray(array) )
+            {
+                return array;
+            }
+            return sort(array,SortUtil::fromSmallToLarge);
+        }
+
+        public static <T> T[] sort(T[] array, BiFunction<T,T,Boolean> biFunction)
+        {
+            if ( isEmptyArray(array) )
+            {
+                return array;
+            }
+            for ( int i = array.length >> 1 ; i > 0 ; i >>= 1 )
+            {
+                for ( int o = i ; o < array.length ; o++ )
+                {
+                    int p = o - i ;
+                    T v = array[o];
+                    for ( ; p >= 0 && biFunction.apply(array[p],v) ; p -= i )
+                    {
+                        array[p + i] = array[p];
+                    }
+                    array[p + i] = v;
+                }
+            }
+            return array;
+        }
     }
 
     public static class Merge
@@ -197,7 +227,8 @@ public class SortUtil
 
     }
 
-    public static <T> boolean isEmptyArray(T[] array){
+    public static <T> boolean isEmptyArray(T[] array)
+    {
         if ( array == null || array.length <= 0 )
         {
             return true;
