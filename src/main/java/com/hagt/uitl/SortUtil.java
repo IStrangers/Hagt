@@ -245,6 +245,32 @@ public class SortUtil
                 int arrOneIdx = i;
                 int arrTowIdx = i << 1 + 1;
                 int arrOneMaxIdx = arrOneIdx << 1;
+                int judgeValue = arr[arrOneIdx];
+                while (arrOneMaxIdx > arrOneIdx)
+                {
+                    if (judgeValue > arr[arrTowIdx])
+                    {
+                        int temp = arr[arrOneIdx];
+                        arr[arrOneIdx] = arr[arrTowIdx];
+                        arr[arrTowIdx] = temp;
+                        arrOneIdx++;
+                    }else{
+                        arr[arrOneIdx] = judgeValue;
+                        arrOneIdx++;
+                    }
+                }
+
+            }
+        }
+
+        public static void mergeSort()
+        {
+            int [] arr = new int[]{165,2,1615,6,3516,516,5156,11,56,56};
+            for (int i = 0 ; i < arr.length >> 1 ; i++ )
+            {
+                int arrOneIdx = i;
+                int arrTowIdx = i << 1 + 1;
+                int arrOneMaxIdx = arrOneIdx << 1;
                 int arrTowMaxIdx = arrTowIdx << 1;
                 while (arrOneMaxIdx < arrOneIdx && arrTowMaxIdx < arrTowIdx )
                 {
@@ -259,11 +285,6 @@ public class SortUtil
                     }
                 }
             }
-        }
-
-        public static void mergeSort()
-        {
-
         }
     }
 
