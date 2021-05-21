@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SortUtil
 {
@@ -197,9 +198,73 @@ public class SortUtil
         }
     }
 
+    //合并排序
     public static class Merge
     {
+        public static int[] sort(int[] array)
+        {
+            Integer[] integerArray = Arrays.stream(array).boxed().toArray(Integer[]::new);
+            if ( isEmptyArray(integerArray) )
+            {
+                return array;
+            }
+            int[] intArray = Arrays.stream(sort(integerArray)).mapToInt(Integer::intValue).toArray();
+            return intArray;
+        }
 
+        public static Integer[] sort(Integer[] array)
+        {
+            if ( isEmptyArray(array) )
+            {
+                return array;
+            }
+            return sort(array,SortUtil::fromSmallToLarge);
+        }
+
+        public static <T> T[] sort(T[] array, BiFunction<T,T,Boolean> biFunction)
+        {
+            if ( isEmptyArray(array) )
+            {
+                return array;
+            }
+            branch(array);
+            return array;
+        }
+
+        public static <T> void branch(T[] array)
+        {
+            int arrayLength = array.length;
+
+
+        }
+
+        public static void main(String[] args) {
+            int [] arr = new int[]{165,2,1615,6,3516,516,5156,11,56,56};
+            for (int i = 0 ; i < arr.length >> 1 ; i++ )
+            {
+                int arrOneIdx = i;
+                int arrTowIdx = i << 1 + 1;
+                int arrOneMaxIdx = arrOneIdx << 1;
+                int arrTowMaxIdx = arrTowIdx << 1;
+                while (arrOneMaxIdx < arrOneIdx && arrTowMaxIdx < arrTowIdx )
+                {
+                    if (arr[arrOneIdx] > arr[arrTowIdx])
+                    {
+                        int temp = arr[arrOneIdx];
+                        arr[arrOneIdx] = arr[arrTowIdx];
+                        arr[arrTowIdx] = temp;
+                        arrOneIdx++;
+                    }else{
+                        arrTowMaxIdx++;
+                    }
+                }
+            }
+        }
+
+        public static void mergeSort()
+        {
+
+        }
     }
 
     public static class Quick
