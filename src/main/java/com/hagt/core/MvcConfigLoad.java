@@ -9,6 +9,8 @@ import com.hagt.core.impl.DefaultMappingFunction;
 import com.hagt.core.enums.ControllerScope;
 import com.hagt.core.model.MethodParam;
 import com.hagt.uitl.JudgeUtil;
+
+import javax.servlet.ServletContext;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -17,6 +19,7 @@ import java.util.*;
 
 public class MvcConfigLoad {
 
+    private ServletContext servletContext;
     private Set<String> classNames = new HashSet<>(999);
     private Set<Class> classes = new HashSet<>(999);
     private Map<Class,Set<Class>> classMap = new HashMap<>();
@@ -67,10 +70,12 @@ public class MvcConfigLoad {
 
     public static MvcConfigLoad load
     (
-        String scanPackage
+        String scanPackage,
+        ServletContext servletContext
     )
     {
         MvcConfigLoad mvcLoadAndConfig = new MvcConfigLoad();
+        mvcLoadAndConfig.servletContext = servletContext;
         boolean isRecursion = true;
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         String packagePath = scanPackage.replace(".", "/");
@@ -81,7 +86,7 @@ public class MvcConfigLoad {
             mvcLoadAndConfig.setClassNames(getClassNameFromDir(url.getPath(), scanPackage, isRecursion));
             mvcLoadAndConfig.setClasses(loadClassAll(mvcLoadAndConfig.getClassNames()));
             mvcLoadAndConfig.setClassMap(loadClassMap(mvcLoadAndConfig.getClasses()));
-            mvcLoadAndConfig.setMapping(loadMapping(mvcLoadAndConfig.getClassMap().get(Controller.class)));
+            mvcLoadAndConfig.setMapping(loadMapping(mvcLoadAndConfig.getClassMap().get(Controller.class),servletContext));
             mvcLoadAndConfig.setHanding(loadHanding(mvcLoadAndConfig.getClassMap().get(Handing.class),mvcLoadAndConfig.getMapping()));
         }
         return mvcLoadAndConfig;
@@ -150,9 +155,10 @@ public class MvcConfigLoad {
         return handing;
     }
 
-    private static Mapping loadMapping(Set<Class> classes)
+    private static Mapping loadMapping(Set<Class> classes, ServletContext servletContext)
     {
         Map<String, MappingFunction> mappingFunctions = new HashMap<>();
+        String contextPath = servletContext.getContextPath();
         for (Class  c : classes)
         {
             Controller controller = (Controller) c.getDeclaredAnnotation(Controller.class);
@@ -165,7 +171,7 @@ public class MvcConfigLoad {
                 {
                     continue;
                 }
-                String mappingUrl = getMappingUrl(method, mappingFunction, baseMappingUrl);
+                String mappingUrl = getMappingUrl(method, mappingFunction, baseMappingUrl,contextPath);
                 ControllerScope controllerScope = getControllerScope(c);
                 int parameterCount = method.getParameterCount();
                 Map<Class, List<MethodParam>> methodParams = getMethodParams(method);
@@ -244,8 +250,9 @@ public class MvcConfigLoad {
         return controllerScope;
     }
 
-    private static String getMappingUrl(Method method,com.hagt.core.annotation.MappingFunction mappingFunction,String baseMappingUrl)
+    private static String getMappingUrl(Method method, com.hagt.core.annotation.MappingFunction mappingFunction, String baseMappingUrl,String contextPath)
     {
+
         String methodName = method.getName();
         String mapingUrl = mappingFunction.url();
         if (JudgeUtil.isNull(mapingUrl))
@@ -256,7 +263,11 @@ public class MvcConfigLoad {
         {
             mapingUrl = formatMappingUrl(baseMappingUrl) + formatMappingUrl(mapingUrl);
         }
-        return mapingUrl;
+        if (JudgeUtil.isNotNull(contextPath))
+        {
+            mapingUrl = formatMappingUrl(contextPath) + formatMappingUrl(mapingUrl);
+        }
+        return formatMappingUrl(mapingUrl);
     }
     
     private static String formatMappingUrl(String mapingUrl)

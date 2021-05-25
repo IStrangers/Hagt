@@ -74,6 +74,13 @@ public class TestController {
         System.out.println(System.currentTimeMillis() - l);
         System.out.println(JSON.toJSONString(ShellSort));
 
+        l = System.currentTimeMillis();
+        System.out.println(l);
+        int [] MergeArray = new int[]{2,156,132,5,1,156,844,64,614,6541,6146,464651,64,64641,0,5616,31,31,65};
+        int[] MergeSort = SortUtil.Merge.sort(MergeArray);
+        System.out.println(System.currentTimeMillis() - l);
+        System.out.println(JSON.toJSONString(MergeSort));
+
     }
 
 }

@@ -218,7 +218,7 @@ public class SortUtil
             {
                 return array;
             }
-            return sort(array,SortUtil::fromSmallToLarge);
+            return sort(array,SortUtil::fromBigAndEqualToSmall);
         }
 
         public static <T> T[] sort(T[] array, BiFunction<T,T,Boolean> biFunction)
@@ -227,65 +227,95 @@ public class SortUtil
             {
                 return array;
             }
-            branch(array);
+            branchMergeSort(array,0,array.length,array.clone(),biFunction);
             return array;
         }
 
-        public static <T> void branch(T[] array)
+        public static <T> void branchMergeSort(T[] array,int left,int right,T[] tempArray,BiFunction<T,T,Boolean> biFunction)
         {
-            int arrayLength = array.length;
-
-
-        }
-
-        public static void main(String[] args) {
-            int [] arr = new int[]{165,2,1615,6,3516,516,5156,11,56,56};
-            for (int i = 0 ; i < arr.length >> 1 ; i++ )
+            if (left < right)
             {
-                int arrOneIdx = i;
-                int arrTowIdx = i << 1 + 1;
-                int arrOneMaxIdx = arrOneIdx << 1;
-                int judgeValue = arr[arrOneIdx];
-                while (arrOneMaxIdx > arrOneIdx)
-                {
-                    if (judgeValue > arr[arrTowIdx])
-                    {
-                        int temp = arr[arrOneIdx];
-                        arr[arrOneIdx] = arr[arrTowIdx];
-                        arr[arrTowIdx] = temp;
-                        arrOneIdx++;
-                    }else{
-                        arr[arrOneIdx] = judgeValue;
-                        arrOneIdx++;
-                    }
-                }
-
+                int midIndex = (left + right) >> 1;
+                branchMergeSort(array,left,midIndex,tempArray,biFunction);
+                branchMergeSort(array,midIndex + 1,right,tempArray,biFunction);
+                mergeSort(array,left,midIndex,right,tempArray,biFunction);
             }
         }
 
-        public static void mergeSort()
+        public static <T> void mergeSort(T[] array,int left,int midIndex,int right,T[] tempArray,BiFunction<T,T,Boolean> biFunction)
         {
-            int [] arr = new int[]{165,2,1615,6,3516,516,5156,11,56,56};
-            for (int i = 0 ; i < arr.length >> 1 ; i++ )
+            int l = left;
+            int mid = midIndex + 1;
+            int t = 0;
+
+            while (l <= midIndex && mid <= right)
             {
-                int arrOneIdx = i;
-                int arrTowIdx = i << 1 + 1;
-                int arrOneMaxIdx = arrOneIdx << 1;
-                int arrTowMaxIdx = arrTowIdx << 1;
-                while (arrOneMaxIdx < arrOneIdx && arrTowMaxIdx < arrTowIdx )
+                //array[l] <= array[mid]
+                if (biFunction.apply(array[l],array[mid]))
                 {
-                    if (arr[arrOneIdx] > arr[arrTowIdx])
-                    {
-                        int temp = arr[arrOneIdx];
-                        arr[arrOneIdx] = arr[arrTowIdx];
-                        arr[arrTowIdx] = temp;
-                        arrOneIdx++;
-                    }else{
-                        arrTowMaxIdx++;
-                    }
+                    tempArray[t++] = array[l++];
+                } else {
+                    tempArray[t++] = array[mid++];
                 }
             }
+
+            while(l <= mid){
+                tempArray[t++] = array[l++];
+            }
+
+            while(mid <= right){
+                tempArray[t++] = array[mid++];
+            }
+
+            t = 0;
+            while(left <= right){
+                array[left++] = tempArray[t++];
+            }
         }
+
+//        public static void main(String[] args) {
+//            int [] arr = new int[]{5,2,4,6,7,1,9,0,3,8};
+//            for (int i = 1 ; i < arr.length >> 1 ; i++ )
+//            {
+//                int count = (arr.length >> 1) - i;
+//                System.out.println(count);
+//                for (int o = 0 ; o < count ; o++)
+//                {
+//                    int arrOneIdx = o * 2;
+//                    int arrTowIdx = o * 2 + 1;
+//                    if (arr[arrOneIdx] > arr[arrTowIdx])
+//                    {
+//                        int temp = arr[arrOneIdx];
+//                        arr[arrOneIdx] = arr[arrTowIdx];
+//                        arr[arrTowIdx] = temp;
+//                    }
+//                }
+//                System.out.println(JSON.toJSONString(arr));
+//            }
+//
+//            int [] arr = new int[]{165,2,1615,6,3516,516,5156,11,56,56};
+//            for (int i = 0 ; i < arr.length >> 1 ; i++ )
+//            {
+//                int arrOneIdx = i;
+//                int arrTowIdx = (i + i + 1);
+//                int arrOneMaxIdx = arrOneIdx << 1;
+//                int judgeValue = arr[arrOneIdx];
+//                while (arrOneMaxIdx >= arrOneIdx)
+//                {
+//                    if (judgeValue > arr[arrTowIdx])
+//                    {
+//                        int temp = arr[arrOneIdx];
+//                        arr[arrOneIdx] = arr[arrTowIdx];
+//                        arr[arrTowIdx] = temp;
+//                        arrOneIdx++;
+//                    }else{
+//                        arr[arrOneIdx] = judgeValue;
+//                        arrOneIdx++;
+//                    }
+//                }
+//            }
+//        }
+
     }
 
     public static class Quick
@@ -330,5 +360,15 @@ public class SortUtil
     public static Boolean fromBigToSmall(Integer arr1,Integer arr2)
     {
         return arr1 < arr2;
+    }
+
+    public static Boolean fromSmallAndEqualToLarge(Integer arr1,Integer arr2)
+    {
+        return arr1 >= arr2;
+    }
+
+    public static Boolean fromBigAndEqualToSmall(Integer arr1,Integer arr2)
+    {
+        return arr1 <= arr2;
     }
 }

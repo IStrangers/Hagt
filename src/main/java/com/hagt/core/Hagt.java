@@ -27,7 +27,7 @@ public class Hagt
     {
         servletContext = filterConfig.getServletContext();
         String scanPackage = filterConfig.getInitParameter("scanPackage");
-        init(scanPackage);
+        init(scanPackage,servletContext);
     }
 
     public void stop()
@@ -35,9 +35,9 @@ public class Hagt
         this.hagt = null;
     }
 
-    public void init(String scanPackage)
+    public void init(String scanPackage, ServletContext servletContext)
     {
-        MvcConfigLoad config = MvcConfigLoad.load(scanPackage);
+        MvcConfigLoad config = MvcConfigLoad.load(scanPackage,servletContext);
         mapping = config.getMapping();
         handing = config.getHanding();
     }
