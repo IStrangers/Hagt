@@ -221,13 +221,13 @@ public class SortUtil
             return sort(array,SortUtil::fromBigAndEqualToSmall);
         }
 
-        public static <T> T[] sort(T[] array, BiFunction<T,T,Boolean> biFunction)
+        public static <T> T[] sort(T[] array,BiFunction<T,T,Boolean> biFunction)
         {
             if ( isEmptyArray(array) )
             {
                 return array;
             }
-            branchMergeSort(array,0,array.length,array.clone(),biFunction);
+            branchMergeSort(array,0,array.length - 1,array.clone(),biFunction);
             return array;
         }
 
@@ -259,7 +259,7 @@ public class SortUtil
                 }
             }
 
-            while(l <= mid){
+            while(l <= midIndex){
                 tempArray[t++] = array[l++];
             }
 
