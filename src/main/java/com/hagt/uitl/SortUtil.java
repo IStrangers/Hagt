@@ -273,49 +273,6 @@ public class SortUtil
             }
         }
 
-//        public static void main(String[] args) {
-//            int [] arr = new int[]{5,2,4,6,7,1,9,0,3,8};
-//            for (int i = 1 ; i < arr.length >> 1 ; i++ )
-//            {
-//                int count = (arr.length >> 1) - i;
-//                System.out.println(count);
-//                for (int o = 0 ; o < count ; o++)
-//                {
-//                    int arrOneIdx = o * 2;
-//                    int arrTowIdx = o * 2 + 1;
-//                    if (arr[arrOneIdx] > arr[arrTowIdx])
-//                    {
-//                        int temp = arr[arrOneIdx];
-//                        arr[arrOneIdx] = arr[arrTowIdx];
-//                        arr[arrTowIdx] = temp;
-//                    }
-//                }
-//                System.out.println(JSON.toJSONString(arr));
-//            }
-//
-//            int [] arr = new int[]{165,2,1615,6,3516,516,5156,11,56,56};
-//            for (int i = 0 ; i < arr.length >> 1 ; i++ )
-//            {
-//                int arrOneIdx = i;
-//                int arrTowIdx = (i + i + 1);
-//                int arrOneMaxIdx = arrOneIdx << 1;
-//                int judgeValue = arr[arrOneIdx];
-//                while (arrOneMaxIdx >= arrOneIdx)
-//                {
-//                    if (judgeValue > arr[arrTowIdx])
-//                    {
-//                        int temp = arr[arrOneIdx];
-//                        arr[arrOneIdx] = arr[arrTowIdx];
-//                        arr[arrTowIdx] = temp;
-//                        arrOneIdx++;
-//                    }else{
-//                        arr[arrOneIdx] = judgeValue;
-//                        arrOneIdx++;
-//                    }
-//                }
-//            }
-//        }
-
     }
 
     public static class Quick
