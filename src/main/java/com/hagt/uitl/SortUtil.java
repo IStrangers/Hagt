@@ -1,10 +1,11 @@
 package com.hagt.uitl;
 
-import com.alibaba.fastjson.JSON;
+import hagtMvc.entity.User;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SortUtil
@@ -283,6 +284,94 @@ public class SortUtil
     public static class Bucket
     {
 
+        public static <T extends BucketSortITF> T[] sort(T[] array,BiFunction<T,T,Boolean> biFunction)
+        {
+            if ( isEmptyArray(array) )
+            {
+                return array;
+            }
+            Integer max = Stream.of(array).mapToInt(e -> ((BucketSortITF) e).SortV().intValue()).max().getAsInt();
+            Integer min = Stream.of(array).mapToInt(e -> ((BucketSortITF) e).SortV().intValue()).min().getAsInt();
+            BigDecimal bucketLength = new BigDecimal((max - min) / array.length + 1);
+            BucketNode<T>[] bucketArray = new BucketNode[bucketLength.intValue()];
+            for (T t : array) {
+                BucketSortITF bucketSortITF = (BucketSortITF) t;
+                int bucketIndex = bucketSortITF.SortV().divide(bucketLength,BigDecimal.ROUND_HALF_UP).intValue();
+                if (bucketArray[bucketIndex] == null){
+                    bucketArray[bucketIndex] = new BucketNode(null,t,null);
+                }else{
+                    BucketNode<T> bucketNode = bucketArray[bucketIndex];
+                    while (bucketNode != null){
+                        T bucketNodeV = bucketNode.getV();
+                        if (biFunction.apply(bucketNodeV,t)){
+                            BucketNode<T> prv = bucketNode.getPrv();
+                            BucketNode<T> insertBucketNode = new BucketNode(prv,t, bucketNode);
+                            bucketNode.setPrv(insertBucketNode);
+                            if (prv == null){
+                                bucketArray[bucketIndex] = insertBucketNode;
+                                break;
+                            }else{
+                                prv.setNext(insertBucketNode);
+                            }
+                        }
+                        bucketNode = bucketNode.getNext();
+                    }
+                }
+            }
+            int index = 0;
+            for (BucketNode<T> bucketNode : bucketArray){
+                if (bucketNode == null){
+                    continue;
+                }
+                array[index++] = bucketNode.getV();
+                BucketNode<T> nextNode = bucketNode.getNext();
+                while (nextNode != null){
+                    array[index++] = nextNode.getV();
+                    nextNode = nextNode.getNext();
+                }
+            }
+            return array;
+        }
+
+        public interface BucketSortITF {
+            BigDecimal SortV();
+        }
+
+        public static class BucketNode<T>{
+            private BucketNode<T> prv;
+            private T v;
+            private BucketNode<T> next;
+
+            public BucketNode(BucketNode<T> prvV,T v,BucketNode<T> nextV){
+                this.prv = prvV;
+                this.v = v;
+                this.next = nextV;
+            }
+
+            public T getV() {
+                return v;
+            }
+
+            public void setV(T v) {
+                this.v = v;
+            }
+
+            public BucketNode<T> getPrv() {
+                return prv;
+            }
+
+            public void setPrv(BucketNode<T> prv) {
+                this.prv = prv;
+            }
+
+            public BucketNode<T> getNext() {
+                return next;
+            }
+
+            public void setNext(BucketNode<T> nextV) {
+                this.next = nextV;
+            }
+        }
     }
 
     public static class Counting
