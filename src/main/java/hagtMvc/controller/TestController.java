@@ -35,7 +35,7 @@ public class TestController {
         fileOutputStream.flush();
         fileOutputStream.close();
         Map<String,String> result = new HashMap<>();
-        result.put("hagt","MVC666");
+        result.put("hagt","test");
         return result;
     }
 
