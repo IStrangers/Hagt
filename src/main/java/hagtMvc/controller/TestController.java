@@ -30,7 +30,7 @@ public class TestController {
     )
         throws IOException
     {
-        FileOutputStream fileOutputStream = new FileOutputStream("C:\\Users\\Administrator\\Desktop\\666.pdf");
+        FileOutputStream fileOutputStream = new FileOutputStream("C:\\Users\\Administrator\\Desktop\\test.pdf");
         fileOutputStream.write(file);
         fileOutputStream.flush();
         fileOutputStream.close();
