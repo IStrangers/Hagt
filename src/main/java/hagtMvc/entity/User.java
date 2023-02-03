@@ -1,10 +1,6 @@
 package hagtMvc.entity;
 
-import com.hagt.uitl.SortUtil;
-
-import java.math.BigDecimal;
-
-public class User implements SortUtil.Bucket.BucketSortITF
+public class User
 {
 
     private String userName;
@@ -32,8 +28,4 @@ public class User implements SortUtil.Bucket.BucketSortITF
         this.age = age;
     }
 
-    @Override
-    public BigDecimal SortV() {
-        return new BigDecimal(this.age);
-    }
 }
