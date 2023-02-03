@@ -13,7 +13,7 @@ import java.util.Map;
 @Controller(baseUrl = "test")
 public class TestController {
 
-    @MappingFunction(url = "/MVC")
+    @MappingFunction(url = "/getData")
     public Map<String,String> test
     (
         @RequestParam("param") String v1,
